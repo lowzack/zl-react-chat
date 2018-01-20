@@ -1,9 +1,20 @@
 import React, { Component } from 'react';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+  state = {
+    from: 'anonymous',
+    content: ''
+  };
+  componentDidMount() {
+    const from = window.prompt('username');
+    from && this.setState({ from })
+  }
   render() {
+    const allChats = this.props.allChatsQuery.allChats || [];
     return (
       <div className="App">
         <header className="App-header">
@@ -11,11 +22,25 @@ class App extends Component {
           <h1 className="App-title">Welcome to React</h1>
         </header>
         <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
+          <h2> Chats </h2>
+          {allChats.map(message => (
+            <p>One Message</p>
+          ))}
         </p>
       </div>
     );
   }
 }
 
-export default App;
+const ALL_CHATS_QUERY = gql`
+  query AllChatsQuery {
+    allChats {
+      id
+      createdAt
+      from
+      content
+    }
+  }
+`;
+
+export default graphql(ALL_CHATS_QUERY, { name: 'allChatsQuery'})(App);
