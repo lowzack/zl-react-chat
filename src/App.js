@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Button } from 'reactstrap';
 import logo from './logo.svg';
 import './App.css';
 
@@ -24,7 +25,7 @@ class App extends Component {
         <p className="App-intro">
           <h2> Chats </h2>
           {allChats.map(message => (
-            <p>One Message</p>
+            <Button color="danger">Message</Button>
           ))}
         </p>
       </div>

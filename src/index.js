@@ -7,6 +7,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink, split } from 'apollo-client-preset';
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
+import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
