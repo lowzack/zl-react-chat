@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Button } from 'reactstrap';
-import logo from './logo.svg';
+import Message from './Message';
+import Navigation from './Navigation';
+import Chatbox from './Chatbox';
 import './App.css';
 
 class App extends Component {
@@ -11,26 +13,76 @@ class App extends Component {
     content: ''
   };
   componentDidMount() {
-    const from = window.prompt('username');
-    from && this.setState({ from })
+    let username = window.localStorage.getItem('username');
+    if(!username) {
+      const promptInput = window.prompt('username');
+      username = promptInput;
+      window.localStorage.setItem('username', username);
+    }
+    username && this.setState({ from: username });
+    this._subscribeToNewChats();
   }
   render() {
     const allChats = this.props.allChatsQuery.allChats || [];
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+        <header>
+          <Navigation/>
         </header>
-        <p className="App-intro">
-          <h2> Chats </h2>
+        <div className="chat-area container mt-3">
           {allChats.map(message => (
-            <Button color="danger">Message</Button>
+            <Message message={message}/>
           ))}
-        </p>
+        </div>
+        <footer>
+          <input
+              value={this.state.content}
+              onChange={e => this.setState({ content: e.target.value })}
+              type="text"
+              placeholder="Start typing"
+              onKeyPress={this._createChat}
+          />
+          <Chatbox/>
+        </footer>
       </div>
     );
   }
+  _createChat = async e => {
+    if (e.key === 'Enter') {
+      const { content, from } = this.state;
+      await this.props.createChatMutation({
+        variables: { content, from }
+      });
+      this.setState({ content: '' });
+    }
+  }
+  _subscribeToNewChats = () => {
+      this.props.allChatsQuery.subscribeToMore({
+          document: gql`
+            subscription {
+              Chat(filter: { mutation_in: [CREATED] }) {
+                node {
+                  id
+                  from
+                  content
+                  createdAt
+                }
+              }
+            }
+          `,
+          updateQuery: (previous, { subscriptionData }) => {
+            const newChatLinks = [
+              ...previous.allChats,
+              subscriptionData.data.Chat.node
+            ];
+            const result = {
+              ...previous,
+              allChats: newChatLinks
+            };
+            return result;
+          }
+        });
+      };
 }
 
 const ALL_CHATS_QUERY = gql`
@@ -44,4 +96,18 @@ const ALL_CHATS_QUERY = gql`
   }
 `;
 
-export default graphql(ALL_CHATS_QUERY, { name: 'allChatsQuery'})(App);
+const CREATE_CHAT_MUTATION = gql`
+  mutation CreateChatMutation($content: String!, $from: String!) {
+    createChat(content: $content, from: $from) {
+      id
+      createdAt
+      from
+      content
+    }
+  }
+`;
+
+export default compose(
+  graphql(ALL_CHATS_QUERY, { name: 'allChatsQuery'}),
+  graphql(CREATE_CHAT_MUTATION, { name: 'createChatMutation'})
+)(App);

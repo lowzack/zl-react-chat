@@ -3,3 +3,7 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.circle-image {
+  border-radius: 99px;
+}
