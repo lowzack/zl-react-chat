@@ -28,7 +28,7 @@ export default class Naviation extends Component {
   }
   render() {
     return (
-      <Navbar color="faded" light fixed expand="md" className='bg-secondary'>
+      <Navbar dark fixed expand="md" className='bg-primary'>
           <NavbarBrand href="/">React Chat</NavbarBrand>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
