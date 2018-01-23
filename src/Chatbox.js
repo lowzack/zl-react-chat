@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import {
@@ -21,6 +23,24 @@ const CREATE_CHAT_MUTATION = gql`
   }
 `;
 
+const loginAction = (user) => {
+  console.log('loggin in as', user)
+  return {
+    type: 'LOGIN',
+    user
+  }
+};
+
+const mapStateToProps = (state) => ({
+  username: state.user
+});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setUser: bindActionCreators(loginAction, dispatch)
+  }
+}
+
 class Chatbox extends Component {
   state = {
     from: 'anonymous',
@@ -33,11 +53,13 @@ class Chatbox extends Component {
       username = promptInput;
       window.localStorage.setItem('username', username);
     }
-    username && this.setState({ from: username });
+    this.props.setUser(username);
   }
   render() {
+    const username = this.props.username;
     return (
       <Container fluid className='fixed-bottom'>
+        <h1>{username}</h1>
         <InputGroup>
           <Input
             placeholder="Enter your message here"
@@ -54,9 +76,9 @@ class Chatbox extends Component {
     )
   }
   async _createChat() {
-    const { content, from } = this.state;
+    const { content } = this.state;
     await this.props.createChatMutation({
-      variables: { content, from }
+      variables: { content, from: this.props.username }
     });
     this.setState({ content: '' });
   }
@@ -67,4 +89,6 @@ class Chatbox extends Component {
   }
 }
 
-export default graphql(CREATE_CHAT_MUTATION, { name: 'createChatMutation'})(Chatbox);
+const ReduxChatbox = connect(mapStateToProps, mapDispatchToProps)(Chatbox)
+
+export default graphql(CREATE_CHAT_MUTATION, { name: 'createChatMutation'})(ReduxChatbox);
