@@ -37,32 +37,34 @@ class Chatbox extends Component {
   }
   render() {
     return (
-        <InputGroup className='fixed-bottom'>
+      <Container fluid className='fixed-bottom'>
+        <InputGroup>
           <Input
             placeholder="Enter your message here"
             value={this.state.content}
             onChange={e => this.setState({ content: e.target.value })}
             type="text"
-            onKeyPress={this._key}
+            onKeyPress={this._checkKey.bind(this)}
           />
           <InputGroupAddon addonType="append">
-            <Button color="success" onClick={this._createChat}>Send</Button>
+            <Button color="success" onClick={this._createChat.bind(this)}>Send</Button>
           </InputGroupAddon>
         </InputGroup>
+      </Container>
     )
   }
-  _createChat = async e => {
+  async _createChat() {
     const { content, from } = this.state;
     await this.props.createChatMutation({
       variables: { content, from }
     });
     this.setState({ content: '' });
   }
-  _keyCheck(e) {
+  _checkKey(e) {
     if (e.key === 'Enter') {
-      this._createChat();
+      this._createChat()
     }
   }
 }
 
-export default graphql(CREATE_CHAT_MUTATION, { name: 'createChatMutation '})(Chatbox);
+export default graphql(CREATE_CHAT_MUTATION, { name: 'createChatMutation'})(Chatbox);
