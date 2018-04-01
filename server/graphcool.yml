@@ -19,12 +19,24 @@ types: ./types.graphql
 
 
 functions:
-  hello:
-    handler:
-      code: src/hello.js
-    type: resolver
-    schema: src/hello.graphql
 
+# added by github template: (please uncomment)
+#
+   githubAuthentication:
+     handler:
+       code:
+         src: ./src/github/githubAuthentication.ts
+         environment:
+           GITHUB_CLIENT_ID: ${env:GITHUB_CLIENT_ID}
+           GITHUB_CLIENT_SECRET: ${env:GITHUB_CLIENT_SECRET}
+     type: resolver
+     schema: ./src/github/githubAuthentication.graphql
+   loggedInUser:
+     handler:
+       code:
+         src: ./src/github/loggedInUser.ts
+     type: resolver
+     schema: ./src/github/loggedInUser.graphql
 
 # Model/Relation permissions are used to limit the API access
 # To take the burden of thinking about those while development, we
@@ -40,4 +52,3 @@ permissions:
 # https://www.graph.cool/docs/reference/auth/authentication/authentication-tokens-eip7ahqu5o
 # rootTokens:
 #   - mytoken
-

@@ -22,6 +22,7 @@ class App extends Component {
   }
   render() {
     const allChats = this.props.allChatsQuery.allChats || [];
+    this.props.updateMessages(allChats);
     return (
       <div className="App">
         <header>
