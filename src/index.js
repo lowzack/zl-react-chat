@@ -4,14 +4,12 @@ import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloLink, split } from 'apollo-client-preset';
+import { split } from 'apollo-client-preset';
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
-import { Provider } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import App from './App';
-import store from './store'
 import registerServiceWorker from './registerServiceWorker';
 
 const wsLink = new WebSocketLink({
@@ -37,9 +35,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <App />
   </ApolloProvider>,
   document.getElementById('root'));
 registerServiceWorker();
