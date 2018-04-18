@@ -1,20 +1,10 @@
 import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
 import { graphql } from 'react-apollo';
-import { connect } from 'react-redux';
 import gql from 'graphql-tag';
-import { Button } from 'reactstrap';
-import MessageList from './MessageList';
+import Message from './Message';
 import Navigation from './Navigation';
 import Chatbox from './Chatbox';
 import './App.css';
-
-const fetchAction = (messages) => {
-  return {
-    type: 'FETCH_MESSAGES',
-    messages
-  }
-};
 
 class App extends Component {
   componentDidMount() {
@@ -22,14 +12,15 @@ class App extends Component {
   }
   render() {
     const allChats = this.props.allChatsQuery.allChats || [];
-    this.props.updateMessages(allChats);
     return (
       <div className="App">
         <header>
           <Navigation/>
         </header>
         <div className="chat-area container mt-3">
-          <MessageList allChats={allChats}/>
+          {allChats.map(message => (
+            <Message message={message}/>
+          ))}
         </div>
         <footer>
           <Chatbox/>
@@ -62,7 +53,6 @@ class App extends Component {
               ...previous,
               allChats: newChatLinks
             };
-            this.props.updateMessages(result.allChats);
             return result;
           }
         });
@@ -80,12 +70,4 @@ const ALL_CHATS_QUERY = gql`
   }
 `;
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateMessages: bindActionCreators(fetchAction, dispatch)
-  }
-}
-
-const ReduxApp = connect(() => {}, mapDispatchToProps)(App)
-
-export default graphql(ALL_CHATS_QUERY, { name: 'allChatsQuery'})(ReduxApp);
+export default graphql(ALL_CHATS_QUERY, { name: 'allChatsQuery'})(App);
